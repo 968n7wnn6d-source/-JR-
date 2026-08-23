@@ -1,0 +1,441 @@
+/* =========================
+   ページ全体
+========================= */
+
+body {
+    margin: 0;
+    padding-top: 120px;
+
+    background-color: #f5f5f5;
+
+    color: #222;
+
+    font-family: sans-serif;
+}
+
+
+/* =========================
+   進捗バー
+========================= */
+
+.progress-bar {
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 50px;
+
+    box-sizing: border-box;
+
+    background-color: #222;
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    z-index: 1000;
+}
+
+
+/* =========================
+   回答欄
+========================= */
+
+.answer-area {
+
+    position: fixed;
+
+    top: 50px;
+    left: 0;
+
+    width: 100%;
+    height: 70px;
+
+    box-sizing: border-box;
+
+    background-color: white;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    border-bottom: 1px solid #ddd;
+
+    z-index: 999;
+}
+
+
+#answer {
+
+    width: 300px;
+
+    padding: 12px;
+
+    box-sizing: border-box;
+
+    font-size: 18px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 6px;
+}
+
+
+#answer-button {
+
+    padding: 12px 25px;
+
+    font-size: 18px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background-color: #222;
+
+    color: white;
+
+    cursor: pointer;
+}
+
+
+#answer-button:hover {
+
+    background-color: #444;
+
+}
+
+
+/* =========================
+   タイトル
+========================= */
+
+header {
+
+    text-align: center;
+
+    padding: 30px 20px;
+
+    background-color: white;
+}
+
+
+header h1 {
+
+    margin: 0 0 10px;
+
+    font-size: 36px;
+}
+
+
+header p {
+
+    margin: 0;
+
+    color: #666;
+}
+
+
+/* =========================
+   メイン
+========================= */
+
+main {
+
+    max-width: 1800px;
+
+    margin: 30px auto;
+
+    padding: 0 15px;
+}
+
+
+/* =========================
+   会社
+========================= */
+
+.company {
+
+    margin-bottom: 10px;
+
+    background-color: white;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+}
+
+
+/* =========================
+   会社トグル
+========================= */
+
+.company-toggle {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 15px 20px;
+
+    border: none;
+
+    background-color: white;
+
+    color: #222;
+
+    text-align: left;
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+
+.company-toggle:hover {
+
+    background-color: #f0f0f0;
+
+}
+
+
+/* 開閉マーク */
+
+.toggle-arrow {
+
+    display: inline-block;
+
+    width: 25px;
+}
+
+
+/* =========================
+   会社の中身
+========================= */
+
+.company-content {
+
+    padding: 0 15px 15px;
+}
+
+
+/* =========================
+   路線5列
+========================= */
+
+.routes-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 15px;
+
+    align-items: start;
+}
+
+
+/* =========================
+   各列
+========================= */
+
+.route-column {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+    min-width: 0;
+}
+
+
+/* =========================
+   路線
+========================= */
+
+.route {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    margin: 0;
+
+    padding: 15px;
+
+    background-color: #fafafa;
+
+    border: 1px solid #ddd;
+
+    border-radius: 8px;
+}
+
+
+.route h2 {
+
+    margin: 0 0 10px;
+
+    padding-bottom: 8px;
+
+    border-bottom: 2px solid #ddd;
+
+    font-size: 20px;
+}
+
+
+/* =========================
+   駅一覧
+========================= */
+
+.station-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    width: 100%;
+
+    margin: 10px 0;
+}
+
+
+/* 1駅1マス */
+
+.station {
+
+    width: 100%;
+
+    min-height: 40px;
+
+    box-sizing: border-box;
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 8px 12px;
+
+    border: 1px solid #ddd;
+
+    background-color: white;
+
+    color: transparent;
+
+    font-size: 16px;
+
+    font-weight: bold;
+}
+
+
+/* 正解した駅 */
+
+.station.found {
+
+    color: #222;
+}
+
+
+/* =========================
+   路線進捗
+========================= */
+
+.route-progress {
+
+    margin: 8px 0 0;
+
+    color: #666;
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   路線制覇
+========================= */
+
+.complete-message {
+
+    margin: 8px 0 0;
+
+    color: #d00000;
+
+    font-size: 18px;
+
+    font-weight: bold;
+}
+
+
+/* =========================
+   正解・不正解
+========================= */
+
+#message {
+
+    text-align: center;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    margin: 20px 0;
+
+    min-height: 25px;
+}
+
+
+/* =========================
+   画面幅による調整
+========================= */
+
+@media (max-width: 1200px) {
+
+    .routes-grid {
+
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+    }
+
+}
+
+
+@media (max-width: 800px) {
+
+    .routes-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .routes-grid {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+}
