@@ -5,13 +5,17 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>日本全駅クイズ</title>
 
-    <link rel="stylesheet"
-          href="style.css">
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 
 </head>
 
@@ -20,32 +24,60 @@
 
 
     <!-- =========================
-         上部固定エリア
+         最上部固定エリア
     ========================== -->
 
     <div class="top-area">
 
-        <!-- 回答率 -->
+
+        <!-- 回答率・統計 -->
 
         <div class="progress-bar">
 
-            発見駅：
-            <span id="found-count">0</span>
-            /
-            <span id="total-count">0</span>
-            駅
+            <div class="progress-main">
 
-            （
-            <span id="progress-percent">0.0</span>
-            %
-            ）
+                回答率
+                <span id="found-count">0</span>
+                /
+                <span id="total-count">0</span>
+                駅
+                （
+                <span id="progress-percent">0.0</span>
+                %
+                ）
+
+            </div>
+
+
+            <div class="statistics">
+
+                <span>
+                    全回答者の平均
+                    <strong id="average-score">
+                        --.-%
+                    </strong>
+                </span>
+
+                <span class="statistics-separator">
+                    |
+                </span>
+
+                <span>
+                    全回答者の最高
+                    <strong id="highest-score">
+                        --.-%
+                    </strong>
+                </span>
+
+            </div>
 
         </div>
 
 
-        <!-- 回答欄 -->
+        <!-- 回答エリア -->
 
         <div class="answer-area">
+
 
             <input
                 type="text"
@@ -54,13 +86,20 @@
                 autocomplete="off"
             >
 
-            <button id="answer-button">
+
+            <button
+                id="answer-button"
+            >
                 回答
             </button>
 
-            <button id="giveup-button">
+
+            <button
+                id="giveup-button"
+            >
                 Give Up
             </button>
+
 
         </div>
 
@@ -69,12 +108,14 @@
 
 
     <!-- =========================
-         タイトル
+         ヘッダー
     ========================== -->
 
     <header>
 
-        <h1>日本全駅クイズ</h1>
+        <h1>
+            日本全駅クイズ
+        </h1>
 
         <p>
             駅名を入力して、日本全国の駅を埋めよう！
@@ -98,9 +139,21 @@
 
 
 
-    <!-- JavaScript -->
+    <!-- =========================
+         Supabase
+    ========================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+
+    <!-- =========================
+         JavaScript
+    ========================== -->
 
     <script src="script.js"></script>
+
 
 </body>
 

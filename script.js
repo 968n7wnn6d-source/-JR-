@@ -1,194 +1,126 @@
-/* =========================
+/* =========================================================
    日本全駅クイズ
    script.js
-========================= */
+========================================================= */
 
 
-/* =========================
+/* =========================================================
+   Supabase設定
+========================================================= */
+
+const SUPABASE_URL =
+    "https://hwxjvaqnuwovjjtehurf.supabase.co";
+
+
+const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_hUxCifGQkgJLeKJye-jfxQ_Xt7_XM73";
+
+
+/* =========================================================
+   Supabase接続
+========================================================= */
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
+
+
+/* =========================================================
    HTML要素
-========================= */
+========================================================= */
 
 const answerInput =
     document.getElementById("answer");
 
+
 const answerButton =
     document.getElementById("answer-button");
+
 
 const giveupButton =
     document.getElementById("giveup-button");
 
+
 const routesContainer =
     document.getElementById("routes-container");
+
 
 const message =
     document.getElementById("message");
 
+
 const foundCount =
     document.getElementById("found-count");
 
+
 const totalCount =
     document.getElementById("total-count");
+
 
 const progressPercent =
     document.getElementById("progress-percent");
 
 
-/* =========================
-   保存場所
-========================= */
-
-/*
-   localStorageに保存するときの名前。
-
-   「日本全駅クイズ」の回答状況を
-   ブラウザ内に保存する。
-*/
-
-const STORAGE_KEY =
-    "japan-station-quiz-found-stations";
+const averageScore =
+    document.getElementById("average-score");
 
 
-/* =========================
-   鉄道会社データ
-========================= */
+const highestScore =
+    document.getElementById("highest-score");
+
+
+/* =========================================================
+   データ
+========================================================= */
 
 let companies = {};
 
 
-/* =========================
-   正解済み駅
-========================= */
-
-/*
-   Setを使って、
-   正解済み駅を重複なしで管理する。
-*/
+/* =========================================================
+   現在の挑戦で正解した駅
+========================================================= */
 
 let foundStationNames =
     new Set();
 
 
-/* =========================
-   保存されている回答を読み込む
-========================= */
+/* =========================================================
+   Give Up済みか
+========================================================= */
 
-function loadSavedAnswers() {
-
-    try {
-
-        const saved =
-            localStorage.getItem(
-                STORAGE_KEY
-            );
+let hasGivenUp = false;
 
 
-        /*
-           保存データがなければ終了
-        */
+/* =========================================================
+   駅名の比較用変換
+========================================================= */
 
-        if (!saved) {
-
-            return;
-
-        }
-
-
-        const stationNames =
-            JSON.parse(saved);
-
-
-        /*
-           配列ならSetに変換
-        */
-
-        if (Array.isArray(stationNames)) {
-
-            foundStationNames =
-                new Set(
-                    stationNames.map(
-                        function(name) {
-
-                            return normalizeStationName(
-                                name
-                            );
-
-                        }
-                    )
-                );
-
-        }
-
-    }
-    catch (error) {
-
-        console.error(
-            "保存データの読み込みに失敗しました。",
-            error
-        );
-
-        foundStationNames =
-            new Set();
-
-    }
-
-}
-
-
-/* =========================
-   回答を保存
-========================= */
-
-function saveAnswers() {
-
-    try {
-
-        const data =
-            Array.from(
-                foundStationNames
-            );
-
-
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(data)
-        );
-
-
-    }
-    catch (error) {
-
-        console.error(
-            "回答の保存に失敗しました。",
-            error
-        );
-
-    }
-
-}
-
-
-/* =========================
-   駅名を比較用に統一
-========================= */
-
-function normalizeStationName(name) {
+function normalizeStationName(
+    name
+) {
 
     /*
        前後の空白を削除
     */
 
-    name = name.trim();
+    name =
+        name.trim();
 
 
     /*
-       全角・半角を統一
+       全角英数字
+       ↓
+       半角英数字
 
-       Ａ → A
-       ＡＢＣ → ABC
-       １２３ → 123
+       その他のUnicode表記も統一
     */
 
-    name = name.normalize("NFKC");
+    name =
+        name.normalize(
+            "NFKC"
+        );
 
 
     /*
@@ -202,8 +134,29 @@ function normalizeStationName(name) {
        保土ケ谷
     */
 
-    name = name.replace(/ヶ/g, "ケ");
-    name = name.replace(/挟/g, "挾");
+    name =
+        name.replace(
+            /ヶ/g,
+            "ケ"
+        );
+
+
+    /*
+       挾と挟を統一
+
+       文挾
+       文挟
+
+       ↓
+
+       文挾
+    */
+
+    name =
+        name.replace(
+            /挟/g,
+            "挾"
+        );
 
 
     return name;
@@ -211,15 +164,21 @@ function normalizeStationName(name) {
 }
 
 
-/* =========================
+/* =========================================================
    CSV読み込み
-========================= */
+========================================================= */
 
-fetch("./stations.csv?" + Date.now())
+fetch(
+    "./stations.csv?" +
+    Date.now()
+)
 
-    .then(function(response) {
+.then(
+    function(response) {
 
-        if (!response.ok) {
+        if (
+            !response.ok
+        ) {
 
             throw new Error(
                 "stations.csv が見つかりません。"
@@ -231,39 +190,53 @@ fetch("./stations.csv?" + Date.now())
 
         }
 
+
         return response.text();
 
-    })
+    }
+)
 
-    .then(function(csvText) {
+.then(
+    function(csvText) {
 
-        loadStations(csvText);
+        loadStations(
+            csvText
+        );
 
-    })
+    }
+)
 
-    .catch(function(error) {
+.catch(
+    function(error) {
 
-        console.error(error);
+        console.error(
+            error
+        );
+
 
         message.textContent =
             "駅データを読み込めませんでした。";
 
+
         message.style.color =
             "#d00000";
 
-    });
+    }
+);
 
 
-/* =========================
+/* =========================================================
    CSV解析
-========================= */
+========================================================= */
 
-function loadStations(csvText) {
+function loadStations(
+    csvText
+) {
 
     try {
 
         /*
-           BOMを削除
+           BOM削除
         */
 
         csvText =
@@ -274,28 +247,31 @@ function loadStations(csvText) {
 
 
         /*
-           改行で分割
+           行に分割
         */
 
         const lines =
-            csvText.split(/\r?\n/);
+            csvText.split(
+                /\r?\n/
+            );
 
-
-        /*
-           データを初期化
-        */
 
         companies = {};
 
 
         /*
-           1行目は見出しなので除外
+           1行目はヘッダー
+
+           路線名,駅名,番号,所属会社名
         */
 
         lines
             .slice(1)
             .forEach(
-                function(line, index) {
+                function(
+                    line,
+                    index
+                ) {
 
                     /*
                        空行は無視
@@ -311,16 +287,12 @@ function loadStations(csvText) {
 
 
                     /*
-                       CSVをカンマで分割
+                       CSVを4列に分割
                     */
 
                     const columns =
                         line.split(",");
 
-
-                    /*
-                       4列必要
-                    */
 
                     if (
                         columns.length < 4
@@ -340,60 +312,74 @@ function loadStations(csvText) {
                     const routeName =
                         columns[0].trim();
 
+
                     const stationName =
                         columns[1].trim();
+
 
                     const number =
                         Number(
                             columns[2].trim()
                         );
 
+
                     const companyName =
                         columns[3].trim();
 
 
                     /*
-                       会社
-                    */
-
-                    if (
-                        !companies[companyName]
-                    ) {
-
-                        companies[companyName] =
-                            {};
-
-                    }
-
-
-                    /*
-                       路線
+                       会社を作成
                     */
 
                     if (
                         !companies[
                             companyName
-                        ][routeName]
+                        ]
                     ) {
 
                         companies[
                             companyName
-                        ][routeName] = [];
+                        ] = {};
 
                     }
 
 
                     /*
-                       駅
+                       路線を作成
+                    */
+
+                    if (
+                        !companies[
+                            companyName
+                        ][
+                            routeName
+                        ]
+                    ) {
+
+                        companies[
+                            companyName
+                        ][
+                            routeName
+                        ] = [];
+
+                    }
+
+
+                    /*
+                       駅を追加
                     */
 
                     companies[
                         companyName
-                    ][routeName].push({
+                    ][
+                        routeName
+                    ].push({
 
-                        name: stationName,
+                        name:
+                            stationName,
 
-                        number: number
+                        number:
+                            number
 
                     });
 
@@ -405,55 +391,59 @@ function loadStations(csvText) {
            駅番号順に並べる
         */
 
-        Object.keys(companies)
-            .forEach(
-                function(companyName) {
+        Object.keys(
+            companies
+        )
+        .forEach(
+            function(
+                companyName
+            ) {
 
-                    Object.keys(
-                        companies[companyName]
-                    )
-                    .forEach(
-                        function(routeName) {
+                Object.keys(
+                    companies[
+                        companyName
+                    ]
+                )
+                .forEach(
+                    function(
+                        routeName
+                    ) {
 
-                            companies[
-                                companyName
-                            ][routeName]
-                            .sort(
-                                function(a, b) {
+                        companies[
+                            companyName
+                        ][
+                            routeName
+                        ].sort(
+                            function(
+                                a,
+                                b
+                            ) {
 
-                                    return (
-                                        a.number
-                                        -
-                                        b.number
-                                    );
+                                return (
+                                    a.number
+                                    -
+                                    b.number
+                                );
 
-                                }
-                            );
+                            }
+                        );
 
-                        }
-                    );
+                    }
+                );
 
-                }
-            );
+            }
+        );
 
 
         /*
-           会社・路線・駅を画面に作る
+           画面作成
         */
 
         createCompanies();
 
 
         /*
-           保存されていた回答を
-           画面に反映
-        */
-
-        restoreAnswers();
-
-
-        /*
-           回答ボタン
+           ボタンイベント
         */
 
         answerButton.addEventListener(
@@ -461,10 +451,6 @@ function loadStations(csvText) {
             checkAnswer
         );
 
-
-        /*
-           Enterキー
-        */
 
         answerInput.addEventListener(
             "keydown",
@@ -482,10 +468,6 @@ function loadStations(csvText) {
         );
 
 
-        /*
-           Give Up
-        */
-
         giveupButton.addEventListener(
             "click",
             giveUp
@@ -493,21 +475,40 @@ function loadStations(csvText) {
 
 
         /*
-           初期表示
+           初期状態
         */
 
         updateProgress();
 
         updateRouteProgress();
 
+
+        /*
+           Supabase統計取得
+        */
+
+        loadStatistics();
+
+
+        /*
+           回答欄にフォーカス
+        */
+
+        answerInput.focus();
+
     }
     catch (error) {
 
-        console.error(error);
+        console.error(
+            error
+        );
+
 
         message.textContent =
-            "CSVエラー：" +
+            "CSVエラー："
+            +
             error.message;
+
 
         message.style.color =
             "#d00000";
@@ -517,19 +518,22 @@ function loadStations(csvText) {
 }
 
 
-/* =========================
+/* =========================================================
    会社・路線・駅を作成
-========================= */
+========================================================= */
 
 function createCompanies() {
 
     const companyNames =
-        Object.keys(companies);
+        Object.keys(
+            companies
+        );
 
 
     companyNames.forEach(
-        function(companyName) {
-
+        function(
+            companyName
+        ) {
 
             /*
                会社全体
@@ -540,13 +544,14 @@ function createCompanies() {
                     "section"
                 );
 
+
             companySection.classList.add(
                 "company"
             );
 
 
             /*
-               会社トグル
+               トグル
             */
 
             const toggle =
@@ -554,9 +559,11 @@ function createCompanies() {
                     "button"
                 );
 
+
             toggle.classList.add(
                 "company-toggle"
             );
+
 
             toggle.innerHTML =
                 '<span class="toggle-arrow">▶</span> '
@@ -573,13 +580,14 @@ function createCompanies() {
                     "div"
                 );
 
+
             companyContent.classList.add(
                 "company-content"
             );
 
 
             /*
-               最初は閉じる
+               初期状態は閉じる
             */
 
             companyContent.style.display =
@@ -587,7 +595,7 @@ function createCompanies() {
 
 
             /*
-               クリックで開閉
+               開閉処理
             */
 
             toggle.addEventListener(
@@ -603,6 +611,7 @@ function createCompanies() {
                         companyContent.style.display =
                             "block";
 
+
                         toggle.querySelector(
                             ".toggle-arrow"
                         ).textContent =
@@ -613,6 +622,7 @@ function createCompanies() {
 
                         companyContent.style.display =
                             "none";
+
 
                         toggle.querySelector(
                             ".toggle-arrow"
@@ -626,13 +636,14 @@ function createCompanies() {
 
 
             /*
-               5列
+               5列グリッド
             */
 
             const routesGrid =
                 document.createElement(
                     "div"
                 );
+
 
             routesGrid.classList.add(
                 "routes-grid"
@@ -641,9 +652,15 @@ function createCompanies() {
 
             const routeNames =
                 Object.keys(
-                    companies[companyName]
+                    companies[
+                        companyName
+                    ]
                 );
 
+
+            /*
+               5列に分配
+            */
 
             const routesPerColumn =
                 Math.ceil(
@@ -653,10 +670,6 @@ function createCompanies() {
 
             const columns = [];
 
-
-            /*
-               5列作成
-            */
 
             for (
                 let i = 0;
@@ -669,13 +682,16 @@ function createCompanies() {
                         "div"
                     );
 
+
                 column.classList.add(
                     "route-column"
                 );
 
+
                 routesGrid.appendChild(
                     column
                 );
+
 
                 columns.push(
                     column
@@ -685,12 +701,14 @@ function createCompanies() {
 
 
             /*
-               路線を配置
+               路線を作成
             */
 
             routeNames.forEach(
-                function(routeName, index) {
-
+                function(
+                    routeName,
+                    index
+                ) {
 
                     const columnIndex =
                         Math.floor(
@@ -708,14 +726,11 @@ function createCompanies() {
                         ];
 
 
-                    /*
-                       路線
-                    */
-
                     const route =
                         document.createElement(
                             "section"
                         );
+
 
                     route.classList.add(
                         "route"
@@ -731,8 +746,10 @@ function createCompanies() {
                             "h2"
                         );
 
+
                     title.textContent =
                         routeName;
+
 
                     route.appendChild(
                         title
@@ -748,6 +765,7 @@ function createCompanies() {
                             "div"
                         );
 
+
                     stationList.classList.add(
                         "station-list"
                     );
@@ -759,10 +777,13 @@ function createCompanies() {
 
                     companies[
                         companyName
-                    ][routeName]
+                    ][
+                        routeName
+                    ]
                     .forEach(
-                        function(stationData) {
-
+                        function(
+                            stationData
+                        ) {
 
                             const station =
                                 document.createElement(
@@ -775,17 +796,9 @@ function createCompanies() {
                             );
 
 
-                            /*
-                               駅名
-                            */
-
                             station.textContent =
                                 stationData.name;
 
-
-                            /*
-                               比較用駅名
-                            */
 
                             station.dataset
                                 .normalizedName =
@@ -794,17 +807,9 @@ function createCompanies() {
                                 );
 
 
-                            /*
-                               路線
-                            */
-
                             station.dataset.route =
                                 routeName;
 
-
-                            /*
-                               会社
-                            */
 
                             station.dataset.company =
                                 companyName;
@@ -832,23 +837,26 @@ function createCompanies() {
                             "p"
                         );
 
+
                     progress.classList.add(
                         "route-progress"
                     );
 
 
                     progress.innerHTML =
-                        '発見駅：'
+                        "発見駅："
                         +
                         '<span class="route-found-count">0</span>'
                         +
-                        ' / '
+                        " / "
                         +
                         companies[
                             companyName
-                        ][routeName].length
+                        ][
+                            routeName
+                        ].length
                         +
-                        '駅';
+                        "駅";
 
 
                     route.appendChild(
@@ -857,13 +865,14 @@ function createCompanies() {
 
 
                     /*
-                       路線制覇
+                       制覇表示
                     */
 
                     const complete =
                         document.createElement(
                             "p"
                         );
+
 
                     complete.classList.add(
                         "complete-message"
@@ -908,56 +917,31 @@ function createCompanies() {
 }
 
 
-/* =========================
-   保存済み回答を復元
-========================= */
-
-function restoreAnswers() {
-
-    const stations =
-        document.querySelectorAll(
-            ".station"
-        );
-
-
-    stations.forEach(
-        function(station) {
-
-            const stationName =
-                station.dataset
-                    .normalizedName;
-
-
-            if (
-                foundStationNames.has(
-                    stationName
-                )
-            ) {
-
-                station.classList.add(
-                    "found"
-                );
-
-            }
-
-        }
-    );
-
-}
-
-
-/* =========================
-   回答
-========================= */
+/* =========================================================
+   回答処理
+========================================================= */
 
 function checkAnswer() {
+
+    /*
+       Give Up後は回答不可
+    */
+
+    if (
+        hasGivenUp
+    ) {
+
+        return;
+
+    }
+
 
     const answer =
         answerInput.value.trim();
 
 
     /*
-       空欄なら何もしない
+       空欄
     */
 
     if (
@@ -980,7 +964,7 @@ function checkAnswer() {
 
 
     /*
-       全駅
+       全駅を取得
     */
 
     const stations =
@@ -989,15 +973,18 @@ function checkAnswer() {
         );
 
 
-    let found = false;
+    let found =
+        false;
 
 
     /*
-       全路線を調べる
+       駅名を検索
     */
 
     stations.forEach(
-        function(station) {
+        function(
+            station
+        ) {
 
             if (
                 station.dataset
@@ -1006,9 +993,9 @@ function checkAnswer() {
                 normalizedAnswer
             ) {
 
-
                 /*
-                   黒字にする
+                   同名駅が複数路線にあれば
+                   すべて黒くする
                 */
 
                 station.classList.add(
@@ -1016,16 +1003,13 @@ function checkAnswer() {
                 );
 
 
-                /*
-                   Give Upの赤字を解除
-                */
-
                 station.classList.remove(
                     "given-up"
                 );
 
 
-                found = true;
+                found =
+                    true;
 
             }
 
@@ -1033,24 +1017,22 @@ function checkAnswer() {
     );
 
 
-    if (found) {
+    /*
+       正解
+    */
 
-        /*
-           正解駅を保存
-
-           ここが今回追加した重要部分
-        */
+    if (
+        found
+    ) {
 
         foundStationNames.add(
             normalizedAnswer
         );
 
 
-        saveAnswers();
-
-
         message.textContent =
             "正解！";
+
 
         message.style.color =
             "#008000";
@@ -1061,6 +1043,7 @@ function checkAnswer() {
         message.textContent =
             "その駅はありません。";
 
+
         message.style.color =
             "#d00000";
 
@@ -1068,7 +1051,7 @@ function checkAnswer() {
 
 
     /*
-       表示更新
+       回答率更新
     */
 
     updateProgress();
@@ -1077,21 +1060,52 @@ function checkAnswer() {
 
 
     /*
-       入力欄を空にする
+       入力欄クリア
     */
 
-    answerInput.value = "";
+    answerInput.value =
+        "";
+
 
     answerInput.focus();
 
 }
 
 
-/* =========================
+/* =========================================================
    Give Up
-========================= */
+========================================================= */
 
-function giveUp() {
+async function giveUp() {
+
+    /*
+       1回の挑戦につき1回だけ
+    */
+
+    if (
+        hasGivenUp
+    ) {
+
+        return;
+
+    }
+
+
+    hasGivenUp =
+        true;
+
+
+    /*
+       Give Up時点の回答率
+    */
+
+    const score =
+        calculateCurrentScore();
+
+
+    /*
+       未回答駅を赤字にする
+    */
 
     const stations =
         document.querySelectorAll(
@@ -1099,12 +1113,10 @@ function giveUp() {
         );
 
 
-    /*
-       正解していない駅だけ赤字
-    */
-
     stations.forEach(
-        function(station) {
+        function(
+            station
+        ) {
 
             if (
                 !station.classList.contains(
@@ -1123,16 +1135,32 @@ function giveUp() {
 
 
     /*
-       Give Upの状態は保存しない。
+       ボタンを無効化
+    */
 
-       ブラウザを閉じれば、
-       赤字表示は消える。
+    giveupButton.disabled =
+        true;
 
-       正解した駅だけが残る。
+
+    answerButton.disabled =
+        true;
+
+
+    answerInput.disabled =
+        true;
+
+
+    /*
+       メッセージ
     */
 
     message.textContent =
-        "未回答の駅を赤字で表示しました。";
+        "Give Up！ 回答率 "
+        +
+        score.toFixed(1)
+        +
+        "%";
+
 
     message.style.color =
         "#d00000";
@@ -1143,16 +1171,44 @@ function giveUp() {
     updateRouteProgress();
 
 
-    answerInput.focus();
+    /*
+       Supabaseへ記録
+    */
+
+    await submitScore(
+        score
+    );
+
+
+    /*
+       最新統計取得
+    */
+
+    await loadStatistics();
 
 }
 
 
-/* =========================
-   全国回答率
-========================= */
+/* =========================================================
+   現在の回答率を計算
+========================================================= */
 
-function updateProgress() {
+function calculateCurrentScore() {
+
+    /*
+       駅名単位で集合を作る
+
+       同じ駅が複数路線にあっても
+       1駅として扱う
+    */
+
+    const allStations =
+        new Set();
+
+
+    const foundStations =
+        new Set();
+
 
     const stations =
         document.querySelectorAll(
@@ -1160,24 +1216,89 @@ function updateProgress() {
         );
 
 
+    stations.forEach(
+        function(
+            station
+        ) {
+
+            const name =
+                station.dataset
+                    .normalizedName;
+
+
+            allStations.add(
+                name
+            );
+
+
+            if (
+                station.classList.contains(
+                    "found"
+                )
+            ) {
+
+                foundStations.add(
+                    name
+                );
+
+            }
+
+        }
+    );
+
+
     /*
-       全駅を重複なしで取得
+       データなし
+    */
+
+    if (
+        allStations.size === 0
+    ) {
+
+        return 0;
+
+    }
+
+
+    return (
+        foundStations.size
+        /
+        allStations.size
+        *
+        100
+    );
+
+}
+
+
+/* =========================================================
+   回答率表示
+========================================================= */
+
+function updateProgress() {
+
+    /*
+       駅名単位で集計
     */
 
     const allStations =
         new Set();
 
 
-    /*
-       正解済み駅を重複なしで取得
-    */
-
     const foundStations =
         new Set();
 
 
+    const stations =
+        document.querySelectorAll(
+            ".station"
+        );
+
+
     stations.forEach(
-        function(station) {
+        function(
+            station
+        ) {
 
             const name =
                 station.dataset
@@ -1213,10 +1334,6 @@ function updateProgress() {
         foundStations.size;
 
 
-    /*
-       表示
-    */
-
     foundCount.textContent =
         found;
 
@@ -1225,33 +1342,36 @@ function updateProgress() {
         total;
 
 
-    /*
-       パーセント
-    */
-
     const percent =
         total === 0
             ? 0
-            : found / total * 100;
+            : found /
+              total *
+              100;
 
 
     progressPercent.textContent =
-        percent.toFixed(1);
+        percent.toFixed(
+            1
+        );
 
 }
 
 
-/* =========================
-   路線進捗
-========================= */
+/* =========================================================
+   路線ごとの進捗
+========================================================= */
 
 function updateRouteProgress() {
 
     document
-        .querySelectorAll(".route")
+        .querySelectorAll(
+            ".route"
+        )
         .forEach(
-            function(route) {
-
+            function(
+                route
+            ) {
 
                 const stations =
                     route.querySelectorAll(
@@ -1265,10 +1385,6 @@ function updateRouteProgress() {
                     );
 
 
-                /*
-                   路線の発見駅数
-                */
-
                 const count =
                     route.querySelector(
                         ".route-found-count"
@@ -1279,15 +1395,15 @@ function updateRouteProgress() {
                     found.length;
 
 
-                /*
-                   路線制覇
-                */
-
                 const complete =
                     route.querySelector(
                         ".complete-message"
                     );
 
+
+                /*
+                   路線内の全駅が埋まった
+                */
 
                 if (
                     stations.length > 0
@@ -1310,5 +1426,240 @@ function updateRouteProgress() {
 
             }
         );
+
+}
+
+
+/* =========================================================
+   Give Upした回答率をSupabaseへ保存
+========================================================= */
+
+async function submitScore(
+    score
+) {
+
+    try {
+
+        const {
+            error
+        } =
+            await supabaseClient
+                .from(
+                    "quiz_results"
+                )
+                .insert({
+
+                    score:
+                        Number(
+                            score.toFixed(
+                                1
+                            )
+                        )
+
+                });
+
+
+        if (
+            error
+        ) {
+
+            console.error(
+                "回答率の送信に失敗しました。",
+                error
+            );
+
+
+            return false;
+
+        }
+
+
+        return true;
+
+    }
+    catch (error) {
+
+        console.error(
+            "Supabaseへの接続に失敗しました。",
+            error
+        );
+
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================================
+   平均・最高をSupabaseから取得
+========================================================= */
+
+async function loadStatistics() {
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from(
+                    "quiz_results"
+                )
+                .select(
+                    "score"
+                );
+
+
+        /*
+           エラー
+        */
+
+        if (
+            error
+        ) {
+
+            console.error(
+                "統計の取得に失敗しました。",
+                error
+            );
+
+
+            averageScore.textContent =
+                "--.-%";
+
+
+            highestScore.textContent =
+                "--.-%";
+
+
+            return;
+
+        }
+
+
+        /*
+           データなし
+        */
+
+        if (
+            !data
+            ||
+            data.length === 0
+        ) {
+
+            averageScore.textContent =
+                "--.-%";
+
+
+            highestScore.textContent =
+                "--.-%";
+
+
+            return;
+
+        }
+
+
+        /*
+           数値だけ取得
+        */
+
+        const scores =
+            data
+                .map(
+                    function(row) {
+
+                        return Number(
+                            row.score
+                        );
+
+                    }
+                )
+                .filter(
+                    function(score) {
+
+                        return Number.isFinite(
+                            score
+                        );
+
+                    }
+                );
+
+
+        if (
+            scores.length === 0
+        ) {
+
+            return;
+
+        }
+
+
+        /*
+           平均
+        */
+
+        const total =
+            scores.reduce(
+                function(
+                    sum,
+                    score
+                ) {
+
+                    return (
+                        sum + score
+                    );
+
+                },
+                0
+            );
+
+
+        const average =
+            total /
+            scores.length;
+
+
+        /*
+           最高
+        */
+
+        const highest =
+            Math.max(
+                ...scores
+            );
+
+
+        /*
+           表示
+        */
+
+        averageScore.textContent =
+            average.toFixed(
+                1
+            )
+            +
+            "%";
+
+
+        highestScore.textContent =
+            highest.toFixed(
+                1
+            )
+            +
+            "%";
+
+    }
+    catch (error) {
+
+        console.error(
+            "統計取得エラー：",
+            error
+        );
+
+    }
 
 }
