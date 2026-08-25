@@ -82,14 +82,18 @@ body {
 
     align-items: center;
 
-    justify-content: center;
+    justify-content: flex-start;
 
-    gap: 10px;
+    padding: 0 30px;
 
     border-bottom: 1px solid #ddd;
 
 }
 
+
+/* =========================
+   入力欄
+========================= */
 
 #answer {
 
@@ -121,6 +125,8 @@ body {
 
 #answer-button {
 
+    margin-left: 10px;
+
     padding: 12px 25px;
 
     font-size: 18px;
@@ -150,6 +156,8 @@ body {
 ========================= */
 
 #giveup-button {
+
+    margin-left: auto;
 
     padding: 12px 25px;
 
@@ -429,10 +437,6 @@ main {
 
     background-color: white;
 
-    /*
-       初期状態では文字を透明にする
-    */
-
     color: transparent;
 
     font-size: 16px;
@@ -464,10 +468,9 @@ main {
 }
 
 
-/*
-   正解した場合は
-   Give Upより黒を優先
-*/
+/* =========================
+   正解した駅は黒字を優先
+========================= */
 
 .station.found.given-up {
 
@@ -560,6 +563,13 @@ main {
 
     }
 
+
+    .answer-area {
+
+        padding: 0 15px;
+
+    }
+
 }
 
 
@@ -578,9 +588,7 @@ main {
 
     .answer-area {
 
-        padding: 5px;
-
-        gap: 5px;
+        padding: 0 8px;
 
     }
 
