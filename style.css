@@ -3,22 +3,29 @@
 ========================= */
 
 body {
+
     margin: 0;
+
     padding-top: 120px;
 
     background-color: #f5f5f5;
 
     color: #222;
 
-    font-family: sans-serif;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
 }
 
 
 /* =========================
-   進捗バー
+   上部固定エリア
 ========================= */
 
-.progress-bar {
+.top-area {
 
     position: fixed;
 
@@ -26,6 +33,18 @@ body {
     left: 0;
 
     width: 100%;
+
+    z-index: 1000;
+
+}
+
+
+/* =========================
+   回答率
+========================= */
+
+.progress-bar {
+
     height: 50px;
 
     box-sizing: border-box;
@@ -37,13 +56,13 @@ body {
     display: flex;
 
     align-items: center;
+
     justify-content: center;
 
     font-size: 18px;
 
     font-weight: bold;
 
-    z-index: 1000;
 }
 
 
@@ -53,12 +72,6 @@ body {
 
 .answer-area {
 
-    position: fixed;
-
-    top: 50px;
-    left: 0;
-
-    width: 100%;
     height: 70px;
 
     box-sizing: border-box;
@@ -68,13 +81,13 @@ body {
     display: flex;
 
     align-items: center;
+
     justify-content: center;
 
     gap: 10px;
 
     border-bottom: 1px solid #ddd;
 
-    z-index: 999;
 }
 
 
@@ -91,8 +104,20 @@ body {
     border: 1px solid #ccc;
 
     border-radius: 6px;
+
 }
 
+
+#answer:focus {
+
+    outline: 2px solid #888;
+
+}
+
+
+/* =========================
+   回答ボタン
+========================= */
 
 #answer-button {
 
@@ -109,12 +134,43 @@ body {
     color: white;
 
     cursor: pointer;
+
 }
 
 
 #answer-button:hover {
 
     background-color: #444;
+
+}
+
+
+/* =========================
+   Give Upボタン
+========================= */
+
+#giveup-button {
+
+    padding: 12px 25px;
+
+    font-size: 18px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background-color: #d00000;
+
+    color: white;
+
+    cursor: pointer;
+
+}
+
+
+#giveup-button:hover {
+
+    background-color: #a00000;
 
 }
 
@@ -130,6 +186,7 @@ header {
     padding: 30px 20px;
 
     background-color: white;
+
 }
 
 
@@ -138,6 +195,7 @@ header h1 {
     margin: 0 0 10px;
 
     font-size: 36px;
+
 }
 
 
@@ -146,6 +204,7 @@ header p {
     margin: 0;
 
     color: #666;
+
 }
 
 
@@ -160,6 +219,26 @@ main {
     margin: 30px auto;
 
     padding: 0 15px;
+
+}
+
+
+/* =========================
+   メッセージ
+========================= */
+
+#message {
+
+    text-align: center;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    margin: 20px 0;
+
+    min-height: 25px;
+
 }
 
 
@@ -176,6 +255,7 @@ main {
     border-radius: 8px;
 
     overflow: hidden;
+
 }
 
 
@@ -204,6 +284,7 @@ main {
     font-weight: bold;
 
     cursor: pointer;
+
 }
 
 
@@ -214,13 +295,16 @@ main {
 }
 
 
-/* 開閉マーク */
+/* =========================
+   矢印
+========================= */
 
 .toggle-arrow {
 
     display: inline-block;
 
     width: 25px;
+
 }
 
 
@@ -231,6 +315,7 @@ main {
 .company-content {
 
     padding: 0 15px 15px;
+
 }
 
 
@@ -248,11 +333,12 @@ main {
     gap: 15px;
 
     align-items: start;
+
 }
 
 
 /* =========================
-   各列
+   列
 ========================= */
 
 .route-column {
@@ -264,6 +350,7 @@ main {
     gap: 10px;
 
     min-width: 0;
+
 }
 
 
@@ -286,6 +373,7 @@ main {
     border: 1px solid #ddd;
 
     border-radius: 8px;
+
 }
 
 
@@ -298,6 +386,7 @@ main {
     border-bottom: 2px solid #ddd;
 
     font-size: 20px;
+
 }
 
 
@@ -314,10 +403,13 @@ main {
     width: 100%;
 
     margin: 10px 0;
+
 }
 
 
-/* 1駅1マス */
+/* =========================
+   駅
+========================= */
 
 .station {
 
@@ -337,19 +429,50 @@ main {
 
     background-color: white;
 
+    /*
+       初期状態では文字を透明にする
+    */
+
     color: transparent;
 
     font-size: 16px;
 
     font-weight: bold;
+
 }
 
 
-/* 正解した駅 */
+/* =========================
+   正解した駅
+========================= */
 
 .station.found {
 
     color: #222;
+
+}
+
+
+/* =========================
+   Give Upで表示された駅
+========================= */
+
+.station.given-up {
+
+    color: #d00000;
+
+}
+
+
+/*
+   正解した場合は
+   Give Upより黒を優先
+*/
+
+.station.found.given-up {
+
+    color: #222;
+
 }
 
 
@@ -364,6 +487,7 @@ main {
     color: #666;
 
     font-size: 14px;
+
 }
 
 
@@ -380,29 +504,28 @@ main {
     font-size: 18px;
 
     font-weight: bold;
+
 }
 
 
 /* =========================
-   正解・不正解
+   PC
 ========================= */
 
-#message {
+@media (min-width: 1201px) {
 
-    text-align: center;
+    .routes-grid {
 
-    font-size: 18px;
+        grid-template-columns:
+            repeat(5, minmax(0, 1fr));
 
-    font-weight: bold;
+    }
 
-    margin: 20px 0;
-
-    min-height: 25px;
 }
 
 
 /* =========================
-   画面幅による調整
+   タブレット
 ========================= */
 
 @media (max-width: 1200px) {
@@ -417,6 +540,10 @@ main {
 }
 
 
+/* =========================
+   小型タブレット
+========================= */
+
 @media (max-width: 800px) {
 
     .routes-grid {
@@ -426,15 +553,51 @@ main {
 
     }
 
+
+    #answer {
+
+        width: 220px;
+
+    }
+
 }
 
+
+/* =========================
+   スマホ
+========================= */
 
 @media (max-width: 500px) {
 
     .routes-grid {
 
-        grid-template-columns:
-            1fr;
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .answer-area {
+
+        padding: 5px;
+
+        gap: 5px;
+
+    }
+
+
+    #answer {
+
+        width: 160px;
+
+    }
+
+
+    #answer-button,
+    #giveup-button {
+
+        padding: 10px 12px;
+
+        font-size: 15px;
 
     }
 

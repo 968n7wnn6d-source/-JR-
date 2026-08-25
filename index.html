@@ -2,71 +2,103 @@
 <html lang="ja">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>日本全駅クイズ</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet"
+          href="style.css">
+
 </head>
 
 
 <body>
 
-    <!-- 画面上部の進捗表示 -->
-    <div class="progress-bar">
 
-        <span>発見駅：</span>
-        <span id="found-count">0</span>
-        <span> / </span>
-        <span id="total-count">0</span>
-        <span>駅</span>
-        <span>（</span>
-        <span id="progress-percent">0.0</span>
-        <span>%）</span>
+    <!-- =========================
+         上部固定エリア
+    ========================== -->
+
+    <div class="top-area">
+
+        <!-- 回答率 -->
+
+        <div class="progress-bar">
+
+            発見駅：
+            <span id="found-count">0</span>
+            /
+            <span id="total-count">0</span>
+            駅
+
+            （
+            <span id="progress-percent">0.0</span>
+            %
+            ）
+
+        </div>
+
+
+        <!-- 回答欄 -->
+
+        <div class="answer-area">
+
+            <input
+                type="text"
+                id="answer"
+                placeholder="駅名を入力"
+                autocomplete="off"
+            >
+
+            <button id="answer-button">
+                回答
+            </button>
+
+            <button id="giveup-button">
+                Give Up
+            </button>
+
+        </div>
 
     </div>
 
 
-    <!-- 回答欄 -->
-    <section class="answer-area">
 
-        <input
-            type="text"
-            id="answer"
-            placeholder="駅名を入力"
-            autocomplete="off"
-        >
+    <!-- =========================
+         タイトル
+    ========================== -->
 
-        <button id="answer-button">
-            回答
-        </button>
-
-    </section>
-
-
-    <!-- タイトル -->
     <header>
 
         <h1>日本全駅クイズ</h1>
 
         <p>
-            駅名を入力して、全国の駅を見つけよう。
+            駅名を入力して、日本全国の駅を埋めよう！
         </p>
 
     </header>
 
 
+
+    <!-- =========================
+         メイン
+    ========================== -->
+
     <main>
 
-        <!-- CSVから路線が自動生成される -->
-        <div id="routes-container"></div>
+        <div id="message"></div>
 
-        <!-- 正解・不正解メッセージ -->
-        <p id="message"></p>
+        <div id="routes-container"></div>
 
     </main>
 
+
+
+    <!-- JavaScript -->
 
     <script src="script.js"></script>
 
